@@ -32,7 +32,8 @@ body {
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: min(86vh, 820px);
+  min-height: 100vh;
+  height: 100vh;
   backdrop-filter: blur(6px);
   background-image: url('../assets/Body BG.png');
   background-size: contain;
@@ -50,6 +51,13 @@ body {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.chat-list::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .chat-list__top {
@@ -166,6 +174,7 @@ body {
 
 .chat-input {
   position: sticky;
+  bottom: 0;
   width: 100%;
   padding: 8px;
   border: 1px solid rgba(0, 0, 0, 0.08);
