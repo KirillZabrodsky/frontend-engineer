@@ -11,9 +11,11 @@ const timeFormatter = new Intl.DateTimeFormat(undefined, {
   minute: '2-digit'
 });
 
+// Normalize potential string values from API payloads.
 const safeString = (value: unknown): string | null =>
   typeof value === 'string' && value.trim().length > 0 ? value.trim() : null;
 
+// Extract author names from common API response shapes.
 const coerceAuthor = (value: unknown): string | null => {
   if (typeof value === 'string') {
     return safeString(value);
@@ -29,6 +31,7 @@ const coerceAuthor = (value: unknown): string | null => {
   return null;
 };
 
+// Extract message text from common API response shapes.
 const coerceMessage = (value: unknown): string | null => {
   if (typeof value === 'string') {
     return safeString(value);
@@ -39,6 +42,7 @@ const coerceMessage = (value: unknown): string | null => {
   return null;
 };
 
+// Convert various date payloads into ISO strings.
 const coerceDate = (value: unknown): string => {
   if (value instanceof Date) {
     return value.toISOString();
@@ -54,7 +58,8 @@ const coerceDate = (value: unknown): string => {
   return new Date().toISOString();
 };
 
-export const buildMessageId = (raw: RawMessage): string => {
+// Provide a stable message id when the API doesn't include one.
+const buildMessageId = (raw: RawMessage): string => {
   const numericId = typeof raw.id === 'number' ? String(raw.id) : null;
   const id = safeString(raw.id) || safeString(raw._id) || numericId;
   if (id) {
@@ -78,6 +83,7 @@ export const buildMessageId = (raw: RawMessage): string => {
   return `${author}-${createdAt}-${message}`;
 };
 
+// Normalize unknown API payloads into the app's Message shape.
 export const normalizeMessage = (raw: RawMessage): Message => {
   const id = buildMessageId(raw);
   const author =

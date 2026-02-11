@@ -12,6 +12,7 @@ import {
   fetchMessages,
   sendMessage
 } from '../api';
+import { CURRENT_AUTHOR } from '../constants';
 import type { Message } from '../types';
 import { mergeMessages, normalizeMessage, sortMessages } from '../utils';
 
@@ -27,7 +28,7 @@ const toErrorMessage = (error: unknown): string => {
   return 'Something went wrong.';
 };
 
-const createOptimisticMessage = (author: string, message: string): Message => {
+const createOptimisticMessage = (message: string): Message => {
   const id =
     typeof crypto !== 'undefined' && 'randomUUID' in crypto
       ? crypto.randomUUID()
@@ -35,7 +36,7 @@ const createOptimisticMessage = (author: string, message: string): Message => {
 
   return {
     id: `optimistic-${id}`,
-    author: author || 'Anonymous',
+    author: CURRENT_AUTHOR,
     message,
     createdAt: new Date().toISOString(),
     pending: true
@@ -64,6 +65,7 @@ export function useChat(): UseChatResult {
   const apiBaseUrl = DEFAULT_BASE_URL;
   const token = DEFAULT_TOKEN;
 
+  // UI state
   const [draft, setDraft] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [status, setStatus] = useState<ChatStatus>('idle');
@@ -77,6 +79,7 @@ export function useChat(): UseChatResult {
   const isAtBottom = useRef(true);
   const previousCount = useRef(0);
 
+  // Derived values based on the current message list.
   const latestTimestamp = messages.length ? messages[messages.length - 1].createdAt : null;
   const oldestTimestamp = messages.length ? messages[0].createdAt : null;
   const canSend = Boolean(draft.trim()) && Boolean(apiBaseUrl) && Boolean(token) && !isSending;
@@ -125,6 +128,7 @@ export function useChat(): UseChatResult {
 
   const loadInitial = useCallback(
     async (signal?: AbortSignal) => {
+      // Initial sync: fetch the latest page of messages.
       if (!apiBaseUrl || !token) {
         setStatus('error');
         setError('Set your API base URL and token to load messages.');
@@ -154,6 +158,7 @@ export function useChat(): UseChatResult {
   );
 
   const loadNewer = useCallback(async () => {
+    // Poll for any messages newer than the last one we have.
     if (!latestTimestamp) {
       return;
     }
@@ -174,6 +179,7 @@ export function useChat(): UseChatResult {
   }, [apiBaseUrl, token, latestTimestamp]);
 
   const loadOlder = useCallback(async () => {
+    // Fetch older messages for "load earlier" UX.
     if (!oldestTimestamp) {
       return;
     }
@@ -200,7 +206,9 @@ export function useChat(): UseChatResult {
   }, [apiBaseUrl, token, oldestTimestamp]);
 
   const send = useCallback(async () => {
-    if (!draft.trim()) {
+    // Send a message with optimistic UI, then reconcile with server response.
+    const messageText = draft.trim();
+    if (!messageText) {
       return;
     }
 
@@ -210,7 +218,7 @@ export function useChat(): UseChatResult {
     }
 
     // Optimistically append the message while the request is in-flight.
-    const optimistic = createOptimisticMessage('Me', draft.trim());
+    const optimistic = createOptimisticMessage(messageText);
     setDraft('');
     setMessages((current) => mergeMessages(current, [optimistic]));
     setIsSending(true);
@@ -219,8 +227,8 @@ export function useChat(): UseChatResult {
       const result = await sendMessage({
         baseUrl: apiBaseUrl,
         token,
-        message: optimistic.message,
-        author: 'Me'
+        message: messageText,
+        author: CURRENT_AUTHOR
       });
 
       if (result) {

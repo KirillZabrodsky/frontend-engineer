@@ -1,4 +1,5 @@
-﻿import type { Message } from '../types';
+﻿import { CURRENT_AUTHOR } from '../constants';
+import type { Message } from '../types';
 import { formatDayLabel, formatTime } from '../utils';
 
 type MessageItemProps = {
@@ -6,7 +7,7 @@ type MessageItemProps = {
 };
 
 export function MessageItem({ message }: MessageItemProps) {
-  const isMe = message.author === 'Me';
+  const isMe = message.author === CURRENT_AUTHOR;
 
   return (
     <article
@@ -15,6 +16,7 @@ export function MessageItem({ message }: MessageItemProps) {
       } ${message.failed ? 'message--failed' : ''}`}
     >
       <div className="message__card">
+        {/* Hide the author for the current user to mimic common chat UI */}
         {!isMe && <p className="message__author">{message.author}</p>}
         <p className="message__text">{message.message}</p>
         <div className="message__meta">

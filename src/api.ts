@@ -31,6 +31,7 @@ const authHeaders = (token: string): HeadersInit => ({
   Authorization: `Bearer ${token}`
 });
 
+// Consistent error formatting for non-2xx responses.
 const ensureOk = (response: Response, message: string): void => {
   if (response.ok) {
     return;
@@ -38,6 +39,7 @@ const ensureOk = (response: Response, message: string): void => {
   throw new Error(`${message} (${response.status})`);
 };
 
+// JSON parsing with a null fallback for non-JSON responses.
 const safeJson = async (response: Response): Promise<unknown> => {
   try {
     return await response.json();
