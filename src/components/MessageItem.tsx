@@ -1,10 +1,6 @@
-﻿import { CURRENT_AUTHOR } from '../constants';
-import type { Message } from '../types';
+import { CURRENT_AUTHOR } from '../constants';
 import { formatDayLabel, formatTime } from '../utils';
-
-type MessageItemProps = {
-  message: Message;
-};
+import type { MessageItemProps } from './chat.types';
 
 export function MessageItem({ message }: MessageItemProps) {
   const isMe = message.author === CURRENT_AUTHOR;

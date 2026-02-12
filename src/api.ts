@@ -1,15 +1,14 @@
-﻿import type { RawMessage } from './types';
+import type { RawMessage } from './types';
+import type {
+  FetchMessagesParams,
+  MessageQuery,
+  SendMessageParams
+} from './api.types';
 
 export const DEFAULT_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000/api/v1';
 export const DEFAULT_TOKEN =
   import.meta.env.VITE_API_TOKEN ?? 'super-secret-doodle-token';
-
-type MessageQuery = {
-  after?: string;
-  before?: string;
-  limit?: number;
-};
 
 const normalizeBaseUrl = (baseUrl: string): string => baseUrl.replace(/\/$/, '');
 
@@ -65,15 +64,6 @@ const extractMessages = (body: unknown): RawMessage[] => {
   return [];
 };
 
-export type FetchMessagesParams = {
-  baseUrl: string;
-  token: string;
-  after?: string;
-  before?: string;
-  limit?: number;
-  signal?: AbortSignal;
-};
-
 export async function fetchMessages({
   baseUrl,
   token,
@@ -93,14 +83,6 @@ export async function fetchMessages({
   const body = await response.json();
   return extractMessages(body);
 }
-
-export type SendMessageParams = {
-  baseUrl: string;
-  token: string;
-  message: string;
-  author: string;
-  signal?: AbortSignal;
-};
 
 export async function sendMessage({
   baseUrl,

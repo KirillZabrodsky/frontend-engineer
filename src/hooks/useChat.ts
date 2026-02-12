@@ -1,10 +1,8 @@
-﻿import {
+import {
   useCallback,
   useEffect,
   useRef,
-  useState,
-  type MutableRefObject,
-  type RefObject
+  useState
 } from 'react';
 import {
   DEFAULT_BASE_URL,
@@ -14,12 +12,12 @@ import {
 } from '../api';
 import { CURRENT_AUTHOR } from '../constants';
 import type { Message } from '../types';
+import type { ChatStatus, UseChatResult } from './useChat.types';
 import { mergeMessages, normalizeMessage, sortMessages } from '../utils';
 
 const MESSAGE_LIMIT = 40;
 const POLL_INTERVAL = 5000;
 
-export type ChatStatus = 'idle' | 'loading' | 'ready' | 'error';
 
 const toErrorMessage = (error: unknown): string => {
   if (error instanceof Error) {
@@ -43,23 +41,6 @@ const createOptimisticMessage = (message: string): Message => {
   };
 };
 
-export type UseChatResult = {
-  draft: string;
-  setDraft: (value: string) => void;
-  messages: Message[];
-  status: ChatStatus;
-  error: string | null;
-  hasOlder: boolean;
-  isSending: boolean;
-  isLoadingOlder: boolean;
-  unreadCount: number;
-  canSend: boolean;
-  listRef: RefObject<HTMLDivElement>;
-  isAtBottom: MutableRefObject<boolean>;
-  loadOlder: () => Promise<void>;
-  scrollToBottom: () => void;
-  send: () => Promise<void>;
-};
 
 export function useChat(): UseChatResult {
   const apiBaseUrl = DEFAULT_BASE_URL;
