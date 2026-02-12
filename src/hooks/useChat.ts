@@ -11,6 +11,7 @@ import {
   sendMessage
 } from '../api';
 import { CURRENT_AUTHOR } from '../constants';
+import { chatStorageStore } from '../store/chatStorageStore';
 import type { Message } from '../types';
 import type { ChatStatus, UseChatResult } from './useChat.types';
 import { mergeMessages, normalizeMessage, sortMessages } from '../utils';
@@ -45,10 +46,14 @@ const createOptimisticMessage = (message: string): Message => {
 export function useChat(): UseChatResult {
   const apiBaseUrl = DEFAULT_BASE_URL;
   const token = DEFAULT_TOKEN;
+  const persistedStateRef = useRef<ReturnType<typeof chatStorageStore.load> | null>(null);
+  if (persistedStateRef.current === null) {
+    persistedStateRef.current = chatStorageStore.load();
+  }
 
   // UI state
-  const [draft, setDraft] = useState('');
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [draft, setDraft] = useState(persistedStateRef.current.draft);
+  const [messages, setMessages] = useState<Message[]>(persistedStateRef.current.messages);
   const [status, setStatus] = useState<ChatStatus>('idle');
   const [error, setError] = useState<string | null>(null);
   const [hasOlder, setHasOlder] = useState(true);
@@ -106,6 +111,10 @@ export function useChat(): UseChatResult {
     }
     previousCount.current = messages.length;
   }, [messages, scrollToBottom]);
+
+  useEffect(() => {
+    chatStorageStore.save({ draft, messages });
+  }, [draft, messages]);
 
   const loadInitial = useCallback(
     async (signal?: AbortSignal) => {
