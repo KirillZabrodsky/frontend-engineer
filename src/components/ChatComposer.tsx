@@ -1,10 +1,4 @@
-﻿type ChatComposerProps = {
-  draft: string;
-  isSending: boolean;
-  canSend: boolean;
-  onDraftChange: (value: string) => void;
-  onSend: () => void;
-};
+import type { ChatComposerProps } from './chat.types';
 
 export function ChatComposer({
   draft,

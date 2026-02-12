@@ -1,20 +1,5 @@
-﻿import type { MutableRefObject, RefObject } from 'react';
-import type { Message } from '../types';
-import type { ChatStatus } from '../hooks/useChat';
 import { MessageItem } from './MessageItem';
-
-type ChatListProps = {
-  messages: Message[];
-  status: ChatStatus;
-  error: string | null;
-  hasOlder: boolean;
-  isLoadingOlder: boolean;
-  unreadCount: number;
-  listRef: RefObject<HTMLDivElement>;
-  isAtBottom: MutableRefObject<boolean>;
-  onLoadOlder: () => void;
-  onJumpToBottom: () => void;
-};
+import type { ChatListProps } from './chat.types';
 
 export function ChatList({
   messages,

@@ -1,8 +1,6 @@
-﻿import type { UseChatResult } from '../hooks/useChat';
 import { ChatComposer } from './ChatComposer';
 import { ChatList } from './ChatList';
-
-type ChatLayoutProps = UseChatResult;
+import type { ChatLayoutProps } from './chat.types';
 
 export function ChatLayout({
   draft,
